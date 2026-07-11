@@ -1,0 +1,128 @@
+.appShell {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f5f7fb;
+  color: #1f2937;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.navRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.navButton,
+.tabButton,
+.primaryButton,
+.secondaryButton,
+.iconButton {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.navButton.active,
+.tabButton.active,
+.primaryButton {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.secondaryButton {
+  background: #f3f4f6;
+}
+
+.contentArea {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.panelHeader {
+  margin-bottom: 16px;
+}
+
+.tabRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dataTable th,
+.dataTable td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.actionIcons {
+  display: flex;
+  gap: 8px;
+}
+
+.iconButton {
+  padding: 6px 8px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+input,
+textarea {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.buttonRow,
+.pagination {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.previewList {
+  display: grid;
+  gap: 12px;
+}
+
+.previewCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fafafa;
+}
+
+.previewMeta {
+  color: #6b7280;
+  margin-bottom: 8px;
+}

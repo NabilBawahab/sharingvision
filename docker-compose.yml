@@ -1,0 +1,51 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sharingvision-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sharingvision
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot_password --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: sharingvision-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_USER: app_user
+      DB_PASSWORD: app_pass
+      DB_PORT: 3306
+      DB_NAME: sharingvision
+      CORS_ORIGINS: http://localhost:5173
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000
+    container_name: sharingvision-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  mysql_data:

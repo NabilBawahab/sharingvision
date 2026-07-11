@@ -1,6 +1,6 @@
-# Sharing Vision
+# Article management app with a React frontend, FastAPI backend, and MySQL database.
 
-Article management app with a React frontend, FastAPI backend, and MySQL database.
+
 
 ## Run with Docker (recommended)
 
@@ -19,14 +19,19 @@ Full stack with one command — no `.env` files needed.
 docker compose up --build
 ```
 
-3. Open the app at [http://localhost:5173](http://localhost:5173).
-4. API docs (optional): [http://localhost:8000/docs](http://localhost:8000/docs)
+1. Open the app at [http://localhost:5173](http://localhost:5173).
+2. API docs (optional): [http://localhost:8000/docs](http://localhost:8000/docs)
+3. API docs (postman JSON): [Sharing vision test collection.postman_collection.json]
+
+
 
 ### Stop
 
 ```bash
 docker compose down
 ```
+
+
 
 ### Reset database
 
@@ -35,6 +40,8 @@ Removes all persisted MySQL data:
 ```bash
 docker compose down -v
 ```
+
+
 
 ## Local development (optional)
 
@@ -46,12 +53,16 @@ Run the frontend and backend on your machine with MySQL in Docker.
 docker compose -f backend/docker-compose.yml up -d
 ```
 
+
+
 ### 2. Configure environment
 
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
+
+
 
 ### 3. Start the backend
 
@@ -60,6 +71,8 @@ cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+
+
 
 ### 4. Start the frontend
 
@@ -73,13 +86,16 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Environment variables
 
-| File | Purpose |
-|------|---------|
-| `backend/.env.example` | Database and CORS settings for local backend dev |
+
+| File                    | Purpose                                              |
+| ----------------------- | ---------------------------------------------------- |
+| `backend/.env.example`  | Database and CORS settings for local backend dev     |
 | `frontend/.env.example` | API URL for local frontend dev (`VITE_API_BASE_URL`) |
+
 
 When using root `docker compose up`, environment values are set in `docker-compose.yml`. For the Docker frontend image, `VITE_API_BASE_URL` is passed as a build argument — rebuild after changing it:
 
 ```bash
 docker compose up --build frontend
 ```
+

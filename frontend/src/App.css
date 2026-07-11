@@ -126,3 +126,12 @@ textarea {
   color: #6b7280;
   margin-bottom: 8px;
 }
+
+.statusMessage {
+  margin: 0 0 12px;
+  color: #6b7280;
+}
+
+.errorMessage {
+  color: #b91c1c;
+}

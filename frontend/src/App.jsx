@@ -1,37 +1,14 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  createArticle as createArticleApi,
+  fetchArticleById,
+  fetchArticles,
+  trashArticle,
+  updateArticle,
+  deleteArticle as deleteArticleApi,
+} from "./services/articleApi";
+import { validateArticleForm } from "./utils/validation";
 import "./App.css";
-
-const initialArticles = [
-  {
-    id: 1,
-    title: "Hello from Sharing Vision",
-    content:
-      "This is an example published article that appears in the preview view.",
-    category: "Tech",
-    status: "published",
-  },
-  {
-    id: 2,
-    title: "Draft Notes",
-    content: "A draft article waiting to be published later.",
-    category: "Lifestyle",
-    status: "draft",
-  },
-  {
-    id: 3,
-    title: "Old Post",
-    content: "This article is currently in the trash bin.",
-    category: "News",
-    status: "trashed",
-  },
-  {
-    id: 4,
-    title: "Another Published Story",
-    content: "This post is visible in the preview and blog list.",
-    category: "Education",
-    status: "published",
-  },
-];
 
 const tabs = [
   { key: "published", label: "Published" },
@@ -40,17 +17,37 @@ const tabs = [
 ];
 
 function App() {
-  const [articles, setArticles] = useState(initialArticles);
+  const [articles, setArticles] = useState([]);
   const [activeView, setActiveView] = useState("allPosts");
   const [activeTab, setActiveTab] = useState("published");
   const [editingArticle, setEditingArticle] = useState(null);
   const [previewPage, setPreviewPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     title: "",
     content: "",
     category: "",
     status: "published",
   });
+
+  const loadArticles = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await fetchArticles();
+      setArticles(data);
+    } catch (err) {
+      setError(err.message || "Failed to load articles");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadArticles();
+  }, [loadArticles]);
 
   const publishedArticles = useMemo(
     () => articles.filter((article) => article.status === "published"),
@@ -76,65 +73,130 @@ function App() {
     setForm({ title: "", content: "", category: "", status: "published" });
   };
 
-  const openEdit = (article) => {
-    setEditingArticle(article);
-    setForm({
-      title: article.title,
-      content: article.content,
-      category: article.category,
-      status: article.status,
-    });
-    setActiveView("edit");
+  const openEdit = async (article) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const freshArticle = await fetchArticleById(article.id);
+      setEditingArticle(freshArticle);
+      setForm({
+        title: freshArticle.title,
+        content: freshArticle.content,
+        category: freshArticle.category,
+        status: freshArticle.status,
+      });
+      setActiveView("edit");
+    } catch (err) {
+      setError(err.message || "Failed to load article");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const moveToTrash = (articleId) => {
-    setArticles((prev) =>
-      prev.map((article) =>
-        article.id === articleId ? { ...article, status: "trashed" } : article,
-      ),
-    );
+  const moveToTrash = async (articleId) => {
+    const article = articles.find((item) => item.id === articleId);
+    if (!article) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await trashArticle(article);
+      await loadArticles();
+      setActiveTab("trashed");
+    } catch (err) {
+      setError(err.message || "Failed to move article to trash");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const saveEditedArticle = (status) => {
+  const saveEditedArticle = async (status) => {
     if (!editingArticle) return;
 
-    setArticles((prev) =>
-      prev.map((article) =>
-        article.id === editingArticle.id
-          ? {
-              ...article,
-              ...form,
-              status,
-              title: form.title.trim(),
-              content: form.content.trim(),
-              category: form.category.trim(),
-            }
-          : article,
-      ),
-    );
-    setEditingArticle(null);
-    setActiveView("allPosts");
-    resetForm();
-  };
-
-  const createArticle = (status) => {
-    if (!form.title.trim() || !form.content.trim() || !form.category.trim()) {
-      alert("Please complete title, content, and category before saving.");
+    const validationError = validateArticleForm(form);
+    if (validationError) {
+      alert(validationError);
       return;
     }
 
-    const newArticle = {
-      id: Date.now(),
-      title: form.title.trim(),
-      content: form.content.trim(),
-      category: form.category.trim(),
-      status,
-    };
+    setLoading(true);
+    setError("");
 
-    setArticles((prev) => [newArticle, ...prev]);
-    resetForm();
+    try {
+      await updateArticle(editingArticle.id, { ...form, status });
+      await loadArticles();
+      setEditingArticle(null);
+      setActiveView("allPosts");
+      setActiveTab(status);
+      resetForm();
+    } catch (err) {
+      setError(err.message || "Failed to update article");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createArticle = async (status) => {
+    const validationError = validateArticleForm(form);
+    if (validationError) {
+      alert(validationError);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await createArticleApi({ ...form, status });
+      await loadArticles();
+      resetForm();
+      setActiveView("allPosts");
+      setActiveTab(status);
+    } catch (err) {
+      setError(err.message || "Failed to create article");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteArticle = async(id)=>{
+    setLoading(true);
+    setError("");
+
+    try {
+      await deleteArticleApi(id);
+      await loadArticles();
+    } catch (err) {
+      setError(err.message || "Failed to delete article");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const goToAllPosts = () => {
     setActiveView("allPosts");
-    setActiveTab(status === "draft" ? "draft" : "published");
+    setActiveTab("published");
+    loadArticles();
+  };
+
+  const goToPreview = () => {
+    setActiveView("preview");
+    setPreviewPage(1);
+    loadArticles();
+  };
+
+  const renderStatusMessage = () => {
+    if (loading) {
+      return <p className="statusMessage">Loading...</p>;
+    }
+
+    if (error) {
+      return <p className="statusMessage errorMessage">{error}</p>;
+    }
+
+    return null;
   };
 
   const renderAllPosts = () => (
@@ -142,6 +204,7 @@ function App() {
       <div className="panelHeader">
         <h2>All Posts</h2>
       </div>
+      {renderStatusMessage()}
       <div className="tabRow">
         {tabs.map((tab) => (
           <button
@@ -178,16 +241,29 @@ function App() {
                       className="iconButton"
                       onClick={() => openEdit(article)}
                       aria-label={`Edit ${article.title}`}
+                      disabled={loading}
                     >
                       ✏️
                     </button>
-                    <button
-                      className="iconButton"
-                      onClick={() => moveToTrash(article.id)}
-                      aria-label={`Move ${article.title} to trash`}
-                    >
-                      🗑️
-                    </button>
+                    {article.status !== "trashed" ? (
+                      <button
+                        className="iconButton"
+                        onClick={() => moveToTrash(article.id)}
+                        aria-label={`Move ${article.title} to trash`}
+                        disabled={loading}
+                      >
+                        🗑️
+                      </button>
+                    ):(
+                      <button
+                        className="iconButton"
+                        onClick={() => deleteArticle(article.id)}
+                        aria-label={`Delete ${article.title}`}
+                        disabled={loading}
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -203,6 +279,7 @@ function App() {
       <div className="panelHeader">
         <h2>Edit Article</h2>
       </div>
+      {renderStatusMessage()}
       <div className="formGroup">
         <label>Title</label>
         <input
@@ -233,12 +310,14 @@ function App() {
         <button
           className="primaryButton"
           onClick={() => saveEditedArticle("published")}
+          disabled={loading}
         >
           Publish
         </button>
         <button
           className="secondaryButton"
           onClick={() => saveEditedArticle("draft")}
+          disabled={loading}
         >
           Draft
         </button>
@@ -251,6 +330,7 @@ function App() {
       <div className="panelHeader">
         <h2>Add New</h2>
       </div>
+      {renderStatusMessage()}
       <div className="formGroup">
         <label>Title</label>
         <input
@@ -281,12 +361,14 @@ function App() {
         <button
           className="primaryButton"
           onClick={() => createArticle("published")}
+          disabled={loading}
         >
           Publish
         </button>
         <button
           className="secondaryButton"
           onClick={() => createArticle("draft")}
+          disabled={loading}
         >
           Draft
         </button>
@@ -299,6 +381,7 @@ function App() {
       <div className="panelHeader">
         <h2>Preview</h2>
       </div>
+      {renderStatusMessage()}
       <div className="previewList">
         {previewItems.length === 0 ? (
           <p>No published articles yet.</p>
@@ -316,7 +399,7 @@ function App() {
         <button
           className="secondaryButton"
           onClick={() => setPreviewPage((page) => Math.max(1, page - 1))}
-          disabled={safePage === 1}
+          disabled={safePage === 1 || loading}
         >
           Previous
         </button>
@@ -328,7 +411,7 @@ function App() {
           onClick={() =>
             setPreviewPage((page) => Math.min(totalPages, page + 1))
           }
-          disabled={safePage === totalPages}
+          disabled={safePage === totalPages || loading}
         >
           Next
         </button>
@@ -343,10 +426,7 @@ function App() {
         <nav className="navRow">
           <button
             className={`navButton ${activeView === "allPosts" ? "active" : ""}`}
-            onClick={() => {
-              setActiveView("allPosts");
-              setActiveTab("published");
-            }}
+            onClick={goToAllPosts}
           >
             All Posts
           </button>
@@ -361,7 +441,7 @@ function App() {
           </button>
           <button
             className={`navButton ${activeView === "preview" ? "active" : ""}`}
-            onClick={() => setActiveView("preview")}
+            onClick={goToPreview}
           >
             Preview
           </button>

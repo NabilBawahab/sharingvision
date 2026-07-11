@@ -1,0 +1,136 @@
+{
+  "info": {
+    "_postman_id": "2c47bf44-d7f4-4337-abe4-6b43f41ec2ae",
+    "name": "Sharing vision test collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40727034"
+  },
+  "item": [
+    {
+      "name": "Create article",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Mantap\",\r\n    \"content\": \"article bagus\",\r\n    \"category\": \"jos\",\r\n    \"status\": \"Draft\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/article",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "article"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update article",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Pwaue9cnaw98eyw08v9be9078wa6veca0978bve6w8a7vc7890a\",\r\n    \"content\": \"5+6+814+98w78+9dawc+9d7a+9sc7d1+9aw8dc7aw+98ce9+7a97dsa94d6s5a4d65asc4d6s5a4cd6a5sd46sa4cda64da6s5d4c65as4d6s5adc4sa65cd41sa65cd4a98csd7aw987ewa98ce7aw98ce7a987e9a7scd7as1cd6as4cd6s5a4d6a5s4cda6s54da65cd49aw8d7wa98ce7wa98e7aw98e7aw98e798wa7ed98as7d64ds6ca54d68acs7d98awce7aw98c7eaw871cd98awc7cdas5cd7ca9s8cd465asccd6sa54dc6sa5dc46as54dc9a87dc98as7dc98aw7ce98wqace7wa98ec7aw9c8e7a6wc4d65asc4dc65asc4d6asce98wc7eaw98ec71a9wc87wa\",\r\n    \"category\": \"jos\",\r\n    \"status\": \"Draft\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/article/{{id}}",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "article",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get article by id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}/article/{{id}}",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "article",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get article by limit offset",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}/article/{{limit}}/{{offset}}",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "article",
+            "{{limit}}",
+            "{{offset}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete article",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{url}}/article/{{id}}",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "article",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
